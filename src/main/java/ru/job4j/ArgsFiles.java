@@ -1,16 +1,21 @@
 package ru.job4j;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Валидация агруменов для запуска.
  */
 public class ArgsFiles {
     private String[] args;
+    private Map<String, String> commands = new HashMap<>();
 
     public ArgsFiles(String[] args) {
         this.args = args;
         if (args.length < 7) {
             throw new IllegalArgumentException("Not enough arguments");
         }
+        setCommands();
     }
 
     /**
@@ -19,8 +24,11 @@ public class ArgsFiles {
      * @return директория поиска.
      */
     public String getDir() {
-        int arg = findByArg("-d");
-        return args[arg + 1];
+        String dir = commands.get("-d");
+        if (dir == null) {
+            throw new IllegalArgumentException("Не найден указатель на директорию поиска.");
+        }
+        return dir;
     }
 
     /**
@@ -29,11 +37,11 @@ public class ArgsFiles {
      * @return название файла.
      */
     public String getNameSearch() {
-        int arg = findByArg("-n");
-        if (arg == -1) {
+        String nameFile = commands.get("-n");
+        if (nameFile == null) {
             throw new IllegalArgumentException("Не найден аргумент указывающий на имя для поиска");
         }
-        return args[arg + 1];
+        return nameFile;
     }
 
     /**
@@ -44,16 +52,16 @@ public class ArgsFiles {
      * @return нужная конфигурация поиска.
      */
     public String getSearchConf() {
-        int arg = findByArg("-f");
-        if (arg == -1) {
-            arg = findByArg("-m");
-            if (arg != -1) {
-                return "-m";
+        String config = commands.get("-f");
+        if (config == null) {
+            config = commands.get("-m");
+            if (config != null) {
+                return config;
             } else {
                 throw new IllegalArgumentException("Не найден указатель на конфигурацию поиска.");
             }
         } else {
-            return "-f";
+            return config;
         }
     }
 
@@ -63,27 +71,20 @@ public class ArgsFiles {
      * @return имя файла.
      */
     public String getOutFile() {
-        int arg = findByArg("-o");
-        if (arg == -1) {
+        String out = commands.get("-o");
+        if (out == null) {
             throw new IllegalArgumentException("Не найден аргумент указывающий на имя файла для записи");
         }
-        return args[arg + 1];
+        return out;
     }
 
     /**
-     * Поиск индекса по названию.
-     *
-     * @param arg название команды.
-     * @return индекс команды.
+     * Устанавливаем команды и их значение в карту.
      */
-    public int findByArg(String arg) {
-        int result = -1;
-        for (int i = 0; i < args.length; i++) {
-            if (args[i].equals(arg)) {
-                result = i;
-                break;
-            }
-        }
-        return result;
+    private void setCommands() {
+        commands.put(args[0], args[1]);
+        commands.put(args[2], args[3]);
+        commands.put(args[4], args[4]);
+        commands.put(args[5], args[6]);
     }
 }
